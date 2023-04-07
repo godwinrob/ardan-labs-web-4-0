@@ -35,7 +35,24 @@ kind-down:
 kind-load:
 	kind load docker-image sales-api:$(VERSION) --name $(KIND_CLUSTER)
 
+kind-apply:
+	kustomize build zcontain/k8s/dev/sales | kubectl apply -f -
+	kubectl wait --timeout=120s --namespace=sales-system --for=condition=Available deployment/sales
+
+kind-restart:
+	kubectl rollout restart deployment sales --namespace=sales-system
+
 kind-status:
 	kubectl get nodes -o wide
 	kubectl get svc -o wide
 	kubectl get pods -o wide --watch --all-namespaces
+
+kind-describe-sales:
+	kubectl describe pod --namespace=sales-system -l app=sales
+
+kind-logs:
+	kubectl logs --namespace=sales-system -l app=sales --all-containers=true -f --tail=100 --max-log-requests=6 | go run app/tooling/logfmt/main.go -service=SALES-API
+
+kind-update: all kind-load kind-restart
+
+kind-update-apply: all kind-load kind-apply

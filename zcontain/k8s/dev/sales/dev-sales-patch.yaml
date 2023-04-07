@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sales # Base POD name
+  namespace: sales-system
+spec:
+  selector:
+    matchLabels:
+      app: sales # Selector for POD name search
+  replicas: 1
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: sales
+    spec:
+      dnsPolicy: ClusterFirstWithHostNet
+      hostNetwork: true
+      containers:
+      - name: sales-api
+        resources:
+          limits:
+            cpu: 2000m # 2 CPUs
+          requests:
+            cpu: 1000m # 1 CPU
