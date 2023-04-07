@@ -1,6 +1,6 @@
 
 run:
-	go run app/services/sales-api/main.go
+	go run app/services/sales-api/main.go | go run app/tooling/logfmt/main.go -service=SALES-API
 
 tidy:
 	go mod tidy
@@ -52,6 +52,9 @@ kind-describe-sales:
 
 kind-logs:
 	kubectl logs --namespace=sales-system -l app=sales --all-containers=true -f --tail=100 --max-log-requests=6 | go run app/tooling/logfmt/main.go -service=SALES-API
+
+metrics-local:
+	expvarmon -ports=":4000" -vars="build,requests,goroutines,errors,panics,mem:memstats.Alloc"
 
 kind-update: all kind-load kind-restart
 
