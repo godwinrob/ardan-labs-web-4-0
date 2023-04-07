@@ -1,20 +1,25 @@
 package main
 
 import (
-	"github.com/godwinrob/service/foundation/logger"
-	"go.uber.org/zap"
+	"fmt"
 	"log"
 	"os"
 	"os/signal"
 	"runtime"
 	"syscall"
+
+	"github.com/godwinrob/service/foundation/logger"
+
+	"go.uber.org/automaxprocs/maxprocs"
+	"go.uber.org/zap"
 )
 
-var build = "develop"
+var build = "0.0"
+var environment = "local"
 
 func main() {
 
-	log.Println("service starting:", build)
+	log.Printf("service starting: version %s in %s environment", build, environment)
 
 	// Call the logging service
 	sugar, err := logger.New("SALES-API")
@@ -41,6 +46,10 @@ func run(sugar *zap.SugaredLogger) error {
 	// GOMAXPROCS
 
 	// Get max available CPUs for this machine
+	opt := maxprocs.Logger(sugar.Infof)
+	if _, err := maxprocs.Set(opt); err != nil {
+		return fmt.Errorf("maxprocs: %w", err)
+	}
 	sugar.Infow("startup", "GOMAXPROCS", runtime.GOMAXPROCS(0))
 
 	////////////////////////////////////////////////////////////////////////
