@@ -1,5 +1,9 @@
+# curl -il sales-service.sales-system.svc.cluster.local:4000/debug/vars
+
 ##############
 # VARIABLES
+
+
 
 GOLANG       := golang:1.20
 ALPINE       := alpine:3.17
@@ -25,6 +29,8 @@ tidy:
 
 
 all: sales
+
+startup: all kind-up kind-load kind-apply
 
 sales:
 	docker build \
